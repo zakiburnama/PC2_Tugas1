@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <title>Modul 1</title>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <div class="row align-items-start">
+            <div class="col-5">
+                <canvas id="canvas1" style="height: 450px; width: auto ;"></canvas>
+            </div>
+            <div class="col-6">
+                <button id="read" type="button" class="btn btn-primary" style="width: 170px; background-color: deeppink;">Read  Image</button>
+                
+                <button id="ori" type="button" class="btn btn-primary" style="width: 170px; background-color: deeppink;">Original  Image</button>
+                
+                <select name="" id="histval">
+                    <option value="0">Red</option>
+                    <option value="1">Green</option>
+                    <option value="2">Blue</option>
+                </select>
+                <button id="hist1" type="button" class="btn btn-primary ms-2" style="width: 110px; background-color: deeppink;">Histogram</button>
+                
+                R <input type="range" min="-255" max="255" data-id="1" id="ch1"><input type="text" id="chv1" size="3" disabled value="0" class="ms-3 mt-2" style="width: 60px;"><br> 
+                G <input type="range" min="-255" max="255" data-id="2" id="ch2"><input type="text" id="chv2" size="3" disabled value="0" class="ms-3 mt-2" style="width: 60px;"><br> 
+                B <input type="range" min="-255" max="255" data-id="3" id="ch3"><input type="text" id="chv3" size="3" disabled value="0" class="ms-3 mt-2" style="width: 60px;"><br> 
+                A <input type="range" min="0" max="255" data-id="4" id="ch4" value="255"><input type="text" id="chv4" size="3" disabled value="255" class="ms-3 mt-2" style="width: 60px;"><br> 
+                <button id="default" type="button" class="btn btn-primary mt-4" style="width: 150px; background-color: deeppink; ">Default RGBA</button>
+                <hr>
+                <canvas id="canvas2" ></canvas>
+            </div>
+        </div>
+    </div>
+</body>
+<style>
+    body{
+        background: rgba(221, 160, 179, 1);
+    }
+</style>
+<script src="pc.js"></script>
+<script>
+    var canvas = document.getElementById('canvas1')
+    var obj = new pc(canvas)
+    obj.image2canvas("b.png")
+
+    var canvas2 = document.getElementById('canvas2')
+    var obj2 = new pc(canvas2)
+    obj2.blank2canvas(100,100)
+
+    var tes = new Array()
+    document.getElementById('read').addEventListener('click', function(){
+        tes = obj.image2read()
+    })
+
+    document.getElementById('ori').addEventListener('click', function(){
+        obj.image2original()
+    })
+
+    function rgbachange(){
+        // copy array to array without reference
+        tesbackup = new Array()
+        for (var c = 0; c < tes.length; c++){
+            temp = new Array()
+            for (var d = 0; d < 4; d++){
+                temp.push(tes[c][d])
+            }
+            tesbackup.push(temp)
+        }
+        // end copy
+
+        for (var j = 0; j < tesbackup.length; j++){
+            tesbackup[j][0] += parseInt(document.getElementById('ch1').value)
+            tesbackup[j][1] += parseInt(document.getElementById('ch2').value)
+            tesbackup[j][2] += parseInt(document.getElementById('ch3').value)
+            tesbackup[j][3] = parseInt(document.getElementById('ch4').value)
+        }
+        
+        for (var i = 1; i <= 4; i++){
+            document.getElementById('chv' + i).value = document.getElementById('ch' + i).value
+        }
+
+        obj.array2canvas(tesbackup)
+    }
+
+    for (var i = 1; i <=4; i++){
+        document.getElementById('ch' + i).addEventListener('input', function(){
+            rgbachange()
+        })
+    }
+
+    document.getElementById('default').addEventListener('click', function(){
+        for (var i = 1; i <= 3; i++){
+            document.getElementById('ch' + i).value = 0
+        }
+        document.getElementById('ch4').value = 255
+        rgbachange()
+    })
+
+    document.getElementById('hist1').addEventListener('click', function(){
+        var hist = obj.hist2read([parseInt(document.getElementById("histval").value)]) // call [R, G, B, A] as [0, 1, 2, 3], can input more than 1 but only [0..3] parameter only
+        obj2.hist2canvas(hist[0], 10)
+    })
+</script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
+</html>
